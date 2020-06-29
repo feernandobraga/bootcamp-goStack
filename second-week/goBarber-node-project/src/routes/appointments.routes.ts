@@ -24,7 +24,7 @@ appointmentsRouter.get("/", async (request, response) => {
 appointmentsRouter.post("/", async (request, response) => {
   try {
     // gets the barber and the date to create an appointment
-    const { provider, date } = request.body;
+    const { provider_id, date } = request.body;
 
     // gets the date that is coming from the api, converts is to a JS object
     const parsedDate = parseISO(date);
@@ -36,7 +36,7 @@ appointmentsRouter.post("/", async (request, response) => {
     // the await keyword. Also, the method post needs to be an asynchronous function.
     const appointment = await createAppointment.execute({
       date: parsedDate,
-      provider,
+      provider_id,
     });
 
     // returns the newly created appointment

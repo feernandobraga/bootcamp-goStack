@@ -5,13 +5,13 @@ import { getCustomRepository } from "typeorm";
 import { startOfHour } from "date-fns";
 
 interface Request {
-  provider: string;
+  provider_id: string;
   date: Date;
 }
 
 class CreateAppointmentService {
   // date and provider are parameters coming from the routes, and strongly type it through the interface Request just above this line.
-  public async execute({ date, provider }: Request): Promise<Appointment> {
+  public async execute({ date, provider_id }: Request): Promise<Appointment> {
     // this line will import the AppointmentsRepository functions from the repository
     const appointmentsRepository = getCustomRepository(AppointmentsRepository);
 
@@ -33,7 +33,7 @@ class CreateAppointmentService {
      * execute needs to be converted to an asynchronous method that returns a promise of type Appointment
      */
     const appointment = appointmentsRepository.create({
-      provider,
+      provider_id,
       date: appointmentDate,
     });
 
