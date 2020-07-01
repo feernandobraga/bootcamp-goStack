@@ -4,6 +4,9 @@ import { getCustomRepository } from "typeorm";
 
 import { startOfHour } from "date-fns";
 
+// import our custom error handling class
+import AppError from "../errors/AppError";
+
 interface Request {
   provider_id: string;
   date: Date;
@@ -24,7 +27,7 @@ class CreateAppointmentService {
     );
 
     if (findAppointmentInSameDate) {
-      throw Error("This time slot is not available anymore");
+      throw new AppError("This time slot is not available anymore");
     }
 
     /**

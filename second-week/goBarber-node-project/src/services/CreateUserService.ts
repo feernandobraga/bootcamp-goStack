@@ -5,6 +5,9 @@ import { getRepository } from "typeorm";
 
 import { hash } from "bcryptjs";
 
+// import our custom error handling class
+import AppError from "../errors/AppError";
+
 // interface that tells how the API will send data to the method execute, which is of type Request.
 interface Request {
   name: string;
@@ -24,7 +27,7 @@ class CreateUserService {
     });
 
     if (checkUserExists) {
-      throw new Error("Email address already used");
+      throw new AppError("Email address already used");
     }
 
     /**
