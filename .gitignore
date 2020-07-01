@@ -1,0 +1,4 @@
+/second-week/goBarber-node-project/node_modules
+
+/second-week/goBarber-node-project/tmp/*
+! /second-week/goBarber-node-project/tmp/.gitkeep
