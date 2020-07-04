@@ -1,6 +1,11 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import { shade } from "polished";
+
+// we create an interface to handle the hasError property coming from the <Form>
+interface FormProps {
+  hasError: boolean;
+}
 
 // we have access to all html components by using styled.HTMLofYourChoiceHere
 // what the code below does is it creates a H1 element with font-size 48 and color #3a3a3a
@@ -10,12 +15,12 @@ export const Title = styled.h1`
   color: #3a3a3a;
   max-width: 450px;
   line-height: 56px;
-
   margin-top: 80px;
 `;
 
 // Styling for the Form element.
-export const Form = styled.form`
+// since we need to handle the hasError property, we need to add the interface FormProps to it
+export const Form = styled.form<FormProps>`
   margin-top: 40px;
   max-width: 700px;
   display: flex;
@@ -27,6 +32,15 @@ export const Form = styled.form`
     border: 0;
     border-radius: 5px 0 0 5px;
     color: #3a3a3a;
+    border: 2px solid #fff;
+    border-right: 0;
+
+    /* this will now style the input element if the hasError is equals to true */
+    ${(props) =>
+      props.hasError &&
+      css`
+        border-color: #c53030;
+      `}
 
     /* the & sign refers to the element under which it is being used. In this case, it's the input */
     &::placeholder {
@@ -105,4 +119,10 @@ export const Repositories = styled.div`
       color: #cbcbd6;
     }
   }
+`;
+
+export const Error = styled.span`
+  display: block;
+  color: #c53030;
+  margin-top: 8px;
 `;

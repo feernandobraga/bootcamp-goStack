@@ -12,7 +12,8 @@ const Routes: React.FC = () => {
     // the application will return the first route, and then the subsequent routes
     <Switch>
       <Route path="/" exact component={Dashboard} />
-      <Route path="/repository" exact component={Repository} />
+      {/* we use :repository+ to the routes will ignore all future slashes: i.e. repository/rep-id/a/b/c/d */}
+      <Route path="/repository/:repository+" exact component={Repository} />
     </Switch>
   );
 };
