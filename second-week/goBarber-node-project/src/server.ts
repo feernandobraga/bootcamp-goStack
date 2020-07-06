@@ -14,8 +14,11 @@ import AppError from "./errors/AppError";
 // importing the database from the database folder
 import "./database";
 
-const app = express();
+// importing CORS to use the API with a front-end
+import cors from "cors";
 
+const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("/files", express.static(uploadConfig.directory));
 app.use(routes);
