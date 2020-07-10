@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 import { shade } from "polished";
 
@@ -15,9 +15,28 @@ export const Content = styled.div`
   flex-direction: column;
   place-content: center;
   align-items: center;
-
   width: 100%;
   max-width: 800px;
+`; /* end Content */
+
+const appearFromRight = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+`;
+
+export const AnimationContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  align-items: center;
+
+  animation: ${appearFromRight} 1s;
 
   form {
     margin: 80px 0;
@@ -42,7 +61,7 @@ export const Content = styled.div`
   }
   /*  targets only anchors where the parent is directly the content. Therefore, it won't target the previous anchor */
   > a {
-    color: #f4ede8;
+    color: #ff9000;
     display: flex;
     align-items: center;
 
@@ -51,14 +70,14 @@ export const Content = styled.div`
     transition: color 0.2s;
 
     &:hover {
-      color: ${shade(0.2, "#f4ede8")};
+      color: ${shade(0.2, "#ff9000")};
     }
 
     svg {
       margin-right: 16px;
     }
   }
-`; /* end Content */
+`; // end content
 
 export const Background = styled.div`
   flex: 1;

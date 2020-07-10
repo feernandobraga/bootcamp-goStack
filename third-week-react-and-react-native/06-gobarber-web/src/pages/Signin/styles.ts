@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 import { shade } from "polished";
 
@@ -15,9 +15,28 @@ export const Content = styled.div`
   flex-direction: column;
   place-content: center;
   align-items: center;
-
   width: 100%;
   max-width: 800px;
+`; /* end Content */
+
+const appearFromLeft = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+`;
+
+export const AnimationContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  align-items: center;
+
+  animation: ${appearFromLeft} 1s;
 
   form {
     margin: 80px 0;
@@ -58,7 +77,7 @@ export const Content = styled.div`
       margin-right: 16px;
     }
   }
-`; /* end Content */
+`;
 
 export const Background = styled.div`
   flex: 1;
