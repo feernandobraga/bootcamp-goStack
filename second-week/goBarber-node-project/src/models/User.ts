@@ -11,7 +11,13 @@ import {
  * User type, it also will save it to the database.
  * We also need to link each property from the class to a column in the database by using more decorators
  */
-@Entity("users")
+
+/**
+ * Because we removed the constructor, TypeScript will complaint that the variables were not initialized.
+ * However, the TypeORM does it in the background.
+ * To get rid of the error, we uncomment the configuration "strictPropertyInitialization:" and we set it to false in the tsconfig.json
+ */
+@Entity("users") // users is the name of the table in the database
 class User {
   @PrimaryGeneratedColumn("uuid") // indicates that id is an auto-generated Primary Key that looks like an uuid
   id: string;
