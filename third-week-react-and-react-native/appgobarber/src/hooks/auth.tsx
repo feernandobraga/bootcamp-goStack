@@ -1,7 +1,16 @@
-import React, { createContext, useCallback, useState, useContext } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
 
 // importing the API
 import api from "../services/api";
+
+// importing the local storage lib
+import AsyncStorage from "@react-native-community/async-storage";
 
 // interface to handle credentials
 interface SignInCredentials {
@@ -12,9 +21,9 @@ interface SignInCredentials {
 // the information we will store about a certain API call
 // this information is going to be accessible by other components/pages
 interface AuthContextData {
-  user: object; // the user logged in
-  signIn(credentials: SignInCredentials): Promise<void>; // signIn method
-  signOut(): void; // signOut method
+  user: object;
+  signIn(credentials: SignInCredentials): Promise<void>;
+  signOut(): void;
 }
 
 // interface to store user information into localStorage
@@ -47,16 +56,24 @@ export function useAuth(): AuthContextData {
 export const AuthProvider: React.FC = ({ children }) => {
   // instead of pre-setting the value of this state manually, we call a function that sets the initial value to either
   // the stored token and user, or null
-  const [data, setData] = useState<AuthState>(() => {
-    const token = localStorage.getItem("@GoBarber:token");
-    const user = localStorage.getItem("@GoBarber:user");
+  const [data, setData] = useState<AuthState>({} as AuthState);
 
-    if (token && user) {
-      return { token, user: JSON.parse(user) };
+  // useEffect to get information from storage
+  useEffect(() => {
+    async function loadStorageData(): Promise<void> {
+      const [token, user] = await AsyncStorage.multiGet([
+        "@GoBarber:token",
+        "@GoBarber:user",
+      ]);
+
+      // the key is stored in the value [0], and the value in the position [1]
+      if (token[1] && user[1]) {
+        setData({ token: token[1], user: JSON.parse(user[1]) });
+      }
     }
 
-    return {} as AuthState;
-  });
+    loadStorageData();
+  }, []);
 
   // a call back function that receives email and password from the caller, and sends the request to the API
   const signIn = useCallback(async ({ email, password }) => {
@@ -68,16 +85,20 @@ export const AuthProvider: React.FC = ({ children }) => {
     // storing the JWT and the user into local storage
     const { token, user } = response.data;
 
-    localStorage.setItem("@GoBarber:token", token);
-    localStorage.setItem("@GoBarber:user", JSON.stringify(user));
+    await AsyncStorage.setItem("@GoBarber:token", token);
+    await AsyncStorage.setItem("@GoBarber:user", JSON.stringify(user));
+
+    await AsyncStorage.multiSet([
+      ["@GoBarber:token", token],
+      ["@GoBarber:user", JSON.stringify(user)],
+    ]);
 
     setData({ token, user });
   }, []);
 
   // function/callback for logout - delete the user from local storage and from the context
-  const signOut = useCallback(() => {
-    localStorage.removeItem("@GoBarber:token");
-    localStorage.removeItem("@GoBarber:user");
+  const signOut = useCallback(async () => {
+    await AsyncStorage.multiRemove(["@GoBarber:token", "@GoBarber:user"]);
     setData({} as AuthState);
   }, []);
 
