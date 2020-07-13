@@ -22,8 +22,9 @@ interface SignInCredentials {
 // this information is going to be accessible by other components/pages
 interface AuthContextData {
   user: object;
-  signIn(credentials: SignInCredentials): Promise<void>;
-  signOut(): void;
+  signIn(credentials: SignInCredentials): Promise<void>; //signIn method
+  signOut(): void; // signOut method
+  loading: boolean;
 }
 
 // interface to store user information into localStorage
@@ -58,6 +59,9 @@ export const AuthProvider: React.FC = ({ children }) => {
   // the stored token and user, or null
   const [data, setData] = useState<AuthState>({} as AuthState);
 
+  // state to check if the application is loading
+  const [loading, setLoading] = useState(true);
+
   // useEffect to get information from storage
   useEffect(() => {
     async function loadStorageData(): Promise<void> {
@@ -70,6 +74,10 @@ export const AuthProvider: React.FC = ({ children }) => {
       if (token[1] && user[1]) {
         setData({ token: token[1], user: JSON.parse(user[1]) });
       }
+
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
 
     loadStorageData();
@@ -104,7 +112,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   return (
     /* AuthContext.Provider is what makes the context available by other components wrapped by it */
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: data.user, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

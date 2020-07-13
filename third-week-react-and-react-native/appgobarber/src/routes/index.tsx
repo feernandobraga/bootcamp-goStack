@@ -1,28 +1,29 @@
 import React from "react";
 
-// used to create the stack style navigation
-import { createStackNavigator } from "@react-navigation/stack";
+// importing protected and non-protected routes
+import AuthRoutes from "./auth.routes";
+import AppRoutes from "./app.routes";
 
-// importing the pages
-import SignIn from "../pages/SignIn";
-import SignUp from "../pages/SignUp";
+// import the hook/context that checks if users are authenticated or not
+import { useAuth } from "../hooks/auth";
 
-// having access to the stack navigation
-const Auth = createStackNavigator();
+// importing loading element
+import { ActivityIndicator, View } from "react-native";
 
-const AuthRoutes: React.FC = () => {
-  return (
-    <Auth.Navigator
-      screenOptions={{
-        headerShown: false,
-        cardStyle: { backgroundColor: "#312e38" },
-      }}
-      // initialRouteName="SignUp"
-    >
-      <Auth.Screen name="SignIn" component={SignIn} />
-      <Auth.Screen name="SignUp" component={SignUp} />
-    </Auth.Navigator>
-  );
+const Routes: React.FC = () => {
+  // retrieve the user
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#999" />
+      </View>
+    );
+  }
+
+  // return correct routes based on user existence
+  return user ? <AppRoutes /> : <AuthRoutes />;
 };
 
-export default AuthRoutes;
+export default Routes;

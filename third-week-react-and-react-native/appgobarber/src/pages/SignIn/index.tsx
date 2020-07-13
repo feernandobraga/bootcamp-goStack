@@ -61,7 +61,7 @@ const SignIn: React.FC = () => {
   // instantiating the hook provider to get the methods signIn and signOut
   const { signIn, user } = useAuth();
 
-  console.log(user);
+  console.log("USSERRRR ISSS", user);
 
   // callback function when the form is submitted
   const handleSignIn = useCallback(
