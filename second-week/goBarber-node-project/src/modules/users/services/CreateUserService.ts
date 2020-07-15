@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User from "../infra/typeorm/entities/User";
 
 // this is the genericRepository with all standard methods()
 import { getRepository } from "typeorm";
@@ -6,7 +6,7 @@ import { getRepository } from "typeorm";
 import { hash } from "bcryptjs";
 
 // import our custom error handling class
-import AppError from "../errors/AppError";
+import AppError from "@shared/errors/AppError";
 
 // interface that tells how the API will send data to the method execute, which is of type Request.
 interface Request {

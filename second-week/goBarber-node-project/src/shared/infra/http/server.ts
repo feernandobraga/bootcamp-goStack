@@ -6,13 +6,13 @@ import "express-async-errors";
 
 import routes from "./routes";
 
-import uploadConfig from "./config/upload";
+import uploadConfig from "@config/upload";
 
 // import our custom error handling class
-import AppError from "./errors/AppError";
+import AppError from "@shared/errors/AppError";
 
 // importing the database from the database folder
-import "./database";
+import "@shared/infra/typeorm";
 
 // importing CORS to use the API with a front-end
 import cors from "cors";

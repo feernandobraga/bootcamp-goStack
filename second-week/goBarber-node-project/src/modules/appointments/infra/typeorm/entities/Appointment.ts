@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 
 // importing the user model, so we can create the relationship between appointments and model
-import User from "./User";
+import User from "@modules/users/infra/typeorm/entities/User";
 
 /**
  * by adding @Entity we are linking new objects from this class with the database, so when you save an object of

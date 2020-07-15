@@ -4,15 +4,15 @@ import { getRepository } from "typeorm";
 import path from "path";
 
 // we import the upload config file so we can get what is the directory where the images are being saved
-import uploadConfig from "../config/upload";
+import uploadConfig from "@config/upload";
 
 // library to handle file system
 import fs from "fs";
 
 // import our custom error handling class
-import AppError from "../errors/AppError";
+import AppError from "@shared/errors/AppError";
 
-import User from "../models/User";
+import User from "../infra/typeorm/entities/User";
 
 // the method execute will receive the user_id and the filename.
 // the filename comes from the multer middleware that we used in the routes

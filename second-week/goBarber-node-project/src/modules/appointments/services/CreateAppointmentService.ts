@@ -1,11 +1,11 @@
-import Appointment from "../models/Appointment";
+import Appointment from "../infra/typeorm/entities/Appointment";
 import AppointmentsRepository from "../repositories/AppointmentsRepository";
 import { getCustomRepository } from "typeorm";
 
 import { startOfHour } from "date-fns";
 
 // import our custom error handling class
-import AppError from "../errors/AppError";
+import AppError from "@shared/errors/AppError";
 
 interface Request {
   provider_id: string;
@@ -35,13 +35,10 @@ class CreateAppointmentService {
      * .save() to actually save it into the database. Since it may take a while to return, we need to use await, and for that, the method
      * execute needs to be converted to an asynchronous method that returns a promise of type Appointment
      */
-    const appointment = appointmentsRepository.create({
+    const appointment = await appointmentsRepository.create({
       provider_id,
       date: appointmentDate,
     });
-
-    // method that saves the record into the database.
-    await appointmentsRepository.save(appointment);
 
     return appointment;
   }

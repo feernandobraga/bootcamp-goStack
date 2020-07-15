@@ -1,6 +1,6 @@
 import { Router, response } from "express";
 
-import CreateUserService from "../services/CreateUserService";
+import CreateUserService from "@modules/users/services/CreateUserService";
 
 // we need to import the ensureAuthenticated middleware to make sure a user can only update the avatar if he/she is Authenticated
 import ensureAuthenticated from "../middlewares/ensureAuthenticated";
@@ -9,10 +9,10 @@ import ensureAuthenticated from "../middlewares/ensureAuthenticated";
 import multer from "multer";
 
 //import the upload configuration file
-import uploadConfig from "../config/upload";
+import uploadConfig from "@config/upload";
 
 // import AvatarService
-import UpdateUserAvatarService from "../services/UpdateUserAvatarService";
+import UpdateUserAvatarService from "@modules/users/services/UpdateUserAvatarService";
 
 const usersRouter = Router();
 

@@ -4,10 +4,10 @@ import { Request, Response, NextFunction } from "express";
 import { verify } from "jsonwebtoken";
 
 // import the file that contains the JWT secret key
-import authConfig from "../config/auth";
+import authConfig from "@config/auth";
 
 // import our custom error handling class
-import AppError from "../errors/AppError";
+import AppError from "@shared/errors/AppError";
 
 // interface with the content returned from the decoded token
 interface TokenPayload {

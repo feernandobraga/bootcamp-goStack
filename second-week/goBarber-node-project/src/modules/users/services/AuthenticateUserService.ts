@@ -7,12 +7,12 @@ import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 
 // import the file that contains the JWT secret key
-import authConfig from "../config/auth";
+import authConfig from "@config/auth";
 
-import User from "../models/User";
+import User from "../infra/typeorm/entities/User";
 
 // import our custom error handling class
-import AppError from "../errors/AppError";
+import AppError from "@shared/errors/AppError";
 
 // interface to handle the request from the routes
 interface Request {
@@ -34,6 +34,8 @@ class AuthenticateUserService {
     const user = await usersRepository.findOne({
       where: { email },
     });
+
+    console.log(user);
 
     if (!user) {
       throw new AppError("Incorrect email/password combination", 401);
