@@ -15,7 +15,8 @@ import crypto from "crypto";
 const tmpFolder = path.resolve(__dirname, "..", "..", "tmp");
 
 export default {
-  directory: tmpFolder, // we export this so we can find that the directory is by using upload.directory from the UpdateUserAvatarService
+  tmpFolder,
+  uploadsFolder: path.resolve(tmpFolder, "uploads"),
 
   storage: multer.diskStorage({
     destination: tmpFolder,

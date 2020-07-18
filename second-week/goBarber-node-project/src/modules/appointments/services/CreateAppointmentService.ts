@@ -1,28 +1,34 @@
 import Appointment from "../infra/typeorm/entities/Appointment";
-import AppointmentsRepository from "../repositories/AppointmentsRepository";
-import { getCustomRepository } from "typeorm";
 
 import { startOfHour } from "date-fns";
 
 // import our custom error handling class
 import AppError from "@shared/errors/AppError";
 
-interface Request {
+// import the dependency injection lib
+import { injectable, inject } from "tsyringe";
+
+import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
+
+interface IRequest {
   provider_id: string;
   date: Date;
 }
 
+@injectable()
 class CreateAppointmentService {
-  // date and provider are parameters coming from the routes, and strongly type it through the interface Request just above this line.
-  public async execute({ date, provider_id }: Request): Promise<Appointment> {
-    // this line will import the AppointmentsRepository functions from the repository
-    const appointmentsRepository = getCustomRepository(AppointmentsRepository);
+  constructor(
+    @inject("AppointmentsRepository")
+    private appointmentsRepository: IAppointmentsRepository
+  ) {}
 
+  // date and provider are parameters coming from the routes, and strongly type it through the interface IRequest just above this line.
+  public async execute({ date, provider_id }: IRequest): Promise<Appointment> {
     const appointmentDate = startOfHour(date);
 
     // runs the method findByDate() from the AppointmentsRepository and if it finds one appointment, returns it,
     // otherwise, it returns null. Since it is querying the database, it needs to be an asynchronous function
-    const findAppointmentInSameDate = await appointmentsRepository.findByDate(
+    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(
       appointmentDate
     );
 
@@ -35,7 +41,7 @@ class CreateAppointmentService {
      * .save() to actually save it into the database. Since it may take a while to return, we need to use await, and for that, the method
      * execute needs to be converted to an asynchronous method that returns a promise of type Appointment
      */
-    const appointment = await appointmentsRepository.create({
+    const appointment = await this.appointmentsRepository.create({
       provider_id,
       date: appointmentDate,
     });

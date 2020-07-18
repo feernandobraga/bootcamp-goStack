@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { parseISO } from "date-fns";
-import AppointmentsRepository from "@modules/appointments/repositories/AppointmentsRepository";
-import CreateAppointmentService from "@modules/appointments/services/CreateAppointmentService";
-import { getCustomRepository } from "typeorm";
 
 // importing the middleware so routes are automatically verified for the token
 import ensureAuthenticated from "@modules/users/infra/http/middlewares/ensureAuthenticated";
+
+// import the controller
+import AppointmentsController from "../controllers/AppointmentsController";
+
+// instantiating a new controller
+const appointmentsController = new AppointmentsController();
 
 const appointmentsRouter = Router();
 
@@ -15,37 +17,17 @@ appointmentsRouter.use(ensureAuthenticated);
 /**
  * GET to localhost:3333/appointments
  */
-appointmentsRouter.get("/", async (request, response) => {
-  const appointmentsRepository = getCustomRepository(AppointmentsRepository);
-  const appointments = await appointmentsRepository.find();
+// appointmentsRouter.get("/", async (request, response) => {
+//   const appointmentsRepository = getCustomRepository(AppointmentsRepository);
+//   const appointments = await appointmentsRepository.find();
 
-  return response.json(appointments);
-});
+//   return response.json(appointments);
+// });
 
 /**
  * POST to localhost:3333/appointments
- * since this will save data to the database, it may take a while, and therefore, we need to handle asynchronous data.
- * We do that by making it an async method and using await in the execute() method.
+ * the route calls the controller that calls the service that calls the repository
  */
-appointmentsRouter.post("/", async (request, response) => {
-  // gets the barber and the date to create an appointment
-  const { provider_id, date } = request.body;
-
-  // gets the date that is coming from the api, converts is to a JS object
-  const parsedDate = parseISO(date);
-
-  // instantiate a new CreateAppointmentService
-  const createAppointment = new CreateAppointmentService();
-
-  // since the execute() will save data to the database, this needs to be an asynchronous function and therefore, needs
-  // the await keyword. Also, the method post needs to be an asynchronous function.
-  const appointment = await createAppointment.execute({
-    date: parsedDate,
-    provider_id,
-  });
-
-  // returns the newly created appointment
-  return response.json(appointment);
-});
+appointmentsRouter.post("/", appointmentsController.create);
 
 export default appointmentsRouter;

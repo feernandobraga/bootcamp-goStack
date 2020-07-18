@@ -1,8 +1,3 @@
-import { getRepository } from "typeorm";
-
-// method to compare the hashed password to the given password
-import { compare } from "bcryptjs";
-
 // method to sign/create the JWT token
 import { sign } from "jsonwebtoken";
 
@@ -14,26 +9,39 @@ import User from "../infra/typeorm/entities/User";
 // import our custom error handling class
 import AppError from "@shared/errors/AppError";
 
+import IUsersRepository from "../repositories/IUsersRepository";
+
+// importing dependency injection decorators
+import { injectable, inject } from "tsyringe";
+
+// import the interface for the provider responsible for hashing the passwords
+import IHashProvider from "../providers/HashProvider/models/IHashProvider";
+
 // interface to handle the request from the routes
-interface Request {
+interface IRequest {
   email: string;
   password: string;
 }
 
 // interface to handle the response type from the method execute
-interface Response {
+interface IResponse {
   user: User;
   token: string;
 }
 
+@injectable()
 class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<Response> {
-    const usersRepository = getRepository(User);
+  constructor(
+    @inject("UsersRepository")
+    private usersRepository: IUsersRepository,
 
+    @inject("HashProvider")
+    private hashProvider: IHashProvider
+  ) {}
+
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
     // select * from users where email is equals to the email passed to the method execute
-    const user = await usersRepository.findOne({
-      where: { email },
-    });
+    const user = await this.usersRepository.findByEmail(email);
 
     console.log(user);
 
@@ -42,7 +50,7 @@ class AuthenticateUserService {
     }
 
     // the method compare() returns true or false if the password give is equal to the password hashed in the database
-    const passwordMatched = await compare(password, user.password);
+    const passwordMatched = await this.hashProvider.compareHash(password, user.password);
 
     if (!passwordMatched) {
       throw new AppError("Incorrect email/password combination", 401);

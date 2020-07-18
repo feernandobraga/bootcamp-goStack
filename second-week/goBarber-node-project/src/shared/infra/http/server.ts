@@ -14,13 +14,16 @@ import AppError from "@shared/errors/AppError";
 // importing the database from the database folder
 import "@shared/infra/typeorm";
 
+// importing the dependency injector container
+import "@shared/container";
+
 // importing CORS to use the API with a front-end
 import cors from "cors";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/files", express.static(uploadConfig.directory));
+app.use("/files", express.static(uploadConfig.tmpFolder));
 app.use(routes);
 
 // this NEEDS to be created RIGHT AFTER the app.use(routes)

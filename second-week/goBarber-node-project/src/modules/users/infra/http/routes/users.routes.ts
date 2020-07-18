@@ -1,6 +1,6 @@
-import { Router, response } from "express";
+import { Router } from "express";
 
-import CreateUserService from "@modules/users/services/CreateUserService";
+// import container for dependency in
 
 // we need to import the ensureAuthenticated middleware to make sure a user can only update the avatar if he/she is Authenticated
 import ensureAuthenticated from "../middlewares/ensureAuthenticated";
@@ -11,8 +11,17 @@ import multer from "multer";
 //import the upload configuration file
 import uploadConfig from "@config/upload";
 
-// import AvatarService
-import UpdateUserAvatarService from "@modules/users/services/UpdateUserAvatarService";
+// import the user avatar controller
+import UserAvatarController from "../controllers/UserAvatarController";
+
+// import the user controller
+import UsersController from "../controllers/UsersController";
+
+// instantiate the controller
+const usersController = new UsersController();
+
+// instantiate the user avatar controller
+const userAvatarController = new UserAvatarController();
 
 const usersRouter = Router();
 
@@ -21,21 +30,9 @@ const upload = multer(uploadConfig);
 
 /**
  * POST to localhost:3333/users
- * since this will save data to the database, it may take a while, and therefore, we need to handle asynchronous data.
- * We do that by making it an async method and using await in the execute() method.
+ * route to create a new user
  */
-usersRouter.post("/", async (request, response) => {
-  const { name, email, password } = request.body;
-
-  const createUser = new CreateUserService();
-
-  const user = await createUser.execute({ name, email, password });
-
-  // we can delete the user password from the response, so it doesn't show back to the user/API request
-  delete user.password;
-
-  return response.json(user);
-});
+usersRouter.post("/", usersController.create);
 
 /**
  * PATCH to localhost:3333/users/avatar
@@ -50,23 +47,7 @@ usersRouter.patch(
   "/avatar",
   ensureAuthenticated,
   upload.single("avatar"),
-  async (request, response) => {
-    const updateUserAvatar = new UpdateUserAvatarService();
-
-    /**
-     * the method execute is passing the user_id for the logged user and the filename generated through the middleware upload.singe('avatar')
-     * we can only retrieve the user_id from the request, because if you remember, we appended the type user inside the Request.
-     * More on that you can find it in your notes about Route Guard - Advanced Routing
-     */
-    const user = await updateUserAvatar.execute({
-      user_id: request.user.id,
-      avatarFilename: request.file.filename,
-    });
-
-    delete user.password;
-
-    return response.json(user);
-  }
+  userAvatarController.update
 );
 
 export default usersRouter;
