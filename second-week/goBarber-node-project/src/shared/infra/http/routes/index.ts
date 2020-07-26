@@ -3,6 +3,7 @@ import { Router } from "express";
 import appointmentsRouter from "@modules/appointments/infra/http/routes/appointments.routes";
 import usersRouter from "@modules/users/infra/http/routes/users.routes";
 import sessionsRouter from "@modules/users/infra/http/routes/sessions.routes";
+import passwordRouter from "@modules/users/infra/http/routes/password.routes";
 
 const routes = Router();
 
@@ -14,5 +15,8 @@ routes.use("/users", usersRouter);
 
 // this redirects every hit to /sessions to the sessions.routes.ts file
 routes.use("/sessions", sessionsRouter);
+
+// redirect the user to the appropriate routes if the route is /password
+routes.use("/password", passwordRouter);
 
 export default routes;
