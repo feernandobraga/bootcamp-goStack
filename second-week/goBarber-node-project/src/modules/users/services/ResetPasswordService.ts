@@ -53,10 +53,19 @@ class ResetPasswordService {
     }
 
     const tokenCreateAt = userToken.created_at;
-    const compareDate = addHours(tokenCreateAt, 2);
+    const compareDate = addHours(tokenCreateAt, 12);
 
-    if (isAfter(Date.now(), compareDate)) {
-      throw new AppError("Expired Token");
+    // console.log(`token created at ${tokenCreateAt}`);
+    // console.log("now", new Date(Date.now()));
+    // console.log(`compare Date ${new Date(compareDate)}`);
+
+    const newCompareDate = new Date(compareDate);
+    // console.log("is after: ", result);
+    // console.log(userToken.created_at);
+    // const now = new Date();
+
+    if (isAfter(new Date(), compareDate)) {
+      throw new AppError("Expired Token :(");
     }
 
     user.password = await this.hashProvider.generateHash(password);

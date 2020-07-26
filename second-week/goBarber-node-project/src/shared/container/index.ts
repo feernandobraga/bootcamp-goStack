@@ -1,3 +1,7 @@
+/**
+ * This files is responsible for the dependency injection
+ * it links an interface with a repository
+ */
 import { container } from "tsyringe";
 
 // importing the dependency injection for the hashing provider

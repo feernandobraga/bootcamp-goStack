@@ -30,7 +30,7 @@ class UserToken {
   @Column()
   user_id: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: () => "Date.NOW()" })
   created_at: Date;
 
   @UpdateDateColumn()
