@@ -74,7 +74,7 @@ describe("ResetPasswordService", () => {
     ).rejects.toBeInstanceOf(AppError);
   });
   //
-  it("should be able to reset the password with expired token", async () => {
+  it("should not be able to reset the password with expired token", async () => {
     //monitor if the method sendMail was called
 
     const user = await fakeUsersRepository.create({
@@ -88,7 +88,7 @@ describe("ResetPasswordService", () => {
     jest.spyOn(Date, "now").mockImplementationOnce(() => {
       // this will return the time 3 hours ahead from now
       const customDate = new Date();
-      return customDate.setHours(customDate.getHours() + 3);
+      return customDate.setHours(customDate.getHours() + 14);
     });
 
     await expect(

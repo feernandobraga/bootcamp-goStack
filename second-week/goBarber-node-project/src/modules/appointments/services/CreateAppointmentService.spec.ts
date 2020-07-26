@@ -6,7 +6,16 @@ import AppError from "@shared/errors/AppError";
 // importing the service that we will test
 import CreateAppointmentService from "./CreateAppointmentService";
 
+let fakeAppointmentsRepository: FakeAppointmentsRepository;
+let createAppointment: CreateAppointmentService;
+
 describe("CreateAppointment", () => {
+  beforeEach(() => {
+    // instantiates the repository and then the service, by passing the repository created
+    fakeAppointmentsRepository = new FakeAppointmentsRepository();
+    createAppointment = new CreateAppointmentService(fakeAppointmentsRepository);
+  });
+
   it("should be able to create a new appointment", async () => {
     // instantiates the repository and then the service, by passing the repository created
     const fakeAppointmentsRepository = new FakeAppointmentsRepository();
@@ -24,10 +33,6 @@ describe("CreateAppointment", () => {
   });
 
   it("should not be able to create two appointments on the same date", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeAppointmentsRepository = new FakeAppointmentsRepository();
-    const createAppointment = new CreateAppointmentService(fakeAppointmentsRepository);
-
     const appointmentDate = new Date(2020, 4, 10, 11);
 
     // create a new appointment

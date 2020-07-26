@@ -9,6 +9,9 @@ import IUserTokensRepository from "../repositories/IUserTokensRepository";
 import IMailProvider from "@shared/container/providers/MailProvider/models/IMailProvider";
 import AppError from "@shared/errors/AppError";
 
+// to retrieve the path to the email template
+import path from "path";
+
 // interface that tells how the API will send data to the method execute, which is of type Request.
 interface IRequest {
   email: string;
@@ -35,7 +38,14 @@ class SendForgotPasswordEmailService {
       throw new AppError("user does not exists.");
     }
 
-    const { token, created_at } = await this.userTokensRepository.generate(user.id);
+    const { token } = await this.userTokensRepository.generate(user.id);
+
+    const forgotPasswordTemplate = path.resolve(
+      __dirname,
+      "..",
+      "views",
+      "forgot_password.hbs"
+    );
 
     await this.mailProvider.sendMail({
       to: {
@@ -44,10 +54,10 @@ class SendForgotPasswordEmailService {
       },
       subject: "[GoBarber] Password Recover",
       templateData: {
-        template: "Hello {{name}}: {{token}}",
+        file: forgotPasswordTemplate, //path to the email template
         variables: {
           name: user.name,
-          token,
+          link: `http://localhost:3000/reset_password?token=${token}`,
         },
       },
     });

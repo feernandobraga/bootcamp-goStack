@@ -8,18 +8,24 @@ import FakeStorageProvider from "@shared/container/providers/StorageProvider/fak
 // importing the service that we will test
 import UpdateUserAvatarService from "./UpdateUserAvatarService";
 
+let fakeUsersRepository: FakeUsersRepository;
+let fakeStorageProvider: FakeStorageProvider;
+let updateUserAvatar: UpdateUserAvatarService;
+
 describe("UpdateUserAvatar", () => {
-  it("should be able to add a new avatar", async () => {
+  beforeEach(() => {
     // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeStorageProvider = new FakeStorageProvider();
+    fakeUsersRepository = new FakeUsersRepository();
+    fakeStorageProvider = new FakeStorageProvider();
 
     // create the service based on the repository
-    const updateUserAvatar = new UpdateUserAvatarService(
+    updateUserAvatar = new UpdateUserAvatarService(
       fakeUsersRepository,
       fakeStorageProvider
     );
+  });
 
+  it("should be able to add a new avatar", async () => {
     // create a new user
     const user = await fakeUsersRepository.create({
       name: "john doe",
@@ -37,16 +43,6 @@ describe("UpdateUserAvatar", () => {
   });
 
   it("should not be able to update avatar if not authenticated", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeStorageProvider = new FakeStorageProvider();
-
-    // create the service based on the repository
-    const updateUserAvatar = new UpdateUserAvatarService(
-      fakeUsersRepository,
-      fakeStorageProvider
-    );
-
     // conditions to satisfy the test
     expect(
       updateUserAvatar.execute({
@@ -57,16 +53,6 @@ describe("UpdateUserAvatar", () => {
   });
 
   it("should delete the old avatar when updating with a new one", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeStorageProvider = new FakeStorageProvider();
-
-    // create the service based on the repository
-    const updateUserAvatar = new UpdateUserAvatarService(
-      fakeUsersRepository,
-      fakeStorageProvider
-    );
-
     // method spy from jest is used to see if certain methods where executed
     const deleteFile = jest.spyOn(fakeStorageProvider, "deleteFile");
 

@@ -11,17 +11,20 @@ import FakeHashProvider from "../providers/HashProvider/fakes/FakeHashProvider";
 // import the service to create user
 import CreateUserService from "./CreateUserService";
 
-describe("AuthenticateUser", () => {
-  it("should be able to authenticate", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeHashProvider = new FakeHashProvider();
-    const createUser = new CreateUserService(fakeUsersRepository, fakeHashProvider);
-    const authenticateUser = new AuthenticateUserService(
-      fakeUsersRepository,
-      fakeHashProvider
-    );
+let fakeUsersRepository: FakeUsersRepository;
+let fakeHashProvider: FakeHashProvider;
+let createUser: CreateUserService;
+let authenticateUser: AuthenticateUserService;
 
+describe("AuthenticateUser", () => {
+  beforeEach(() => {
+    fakeUsersRepository = new FakeUsersRepository();
+    fakeHashProvider = new FakeHashProvider();
+    createUser = new CreateUserService(fakeUsersRepository, fakeHashProvider);
+    authenticateUser = new AuthenticateUserService(fakeUsersRepository, fakeHashProvider);
+  });
+
+  it("should be able to authenticate", async () => {
     const user = await createUser.execute({
       name: "john doe",
       email: "johndoe@example.com",
@@ -40,17 +43,8 @@ describe("AuthenticateUser", () => {
   });
 
   it("should not be able to authenticate with a non-existent user", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeHashProvider = new FakeHashProvider();
-
-    const authenticateUser = new AuthenticateUserService(
-      fakeUsersRepository,
-      fakeHashProvider
-    );
-
     // conditions to satisfy the test
-    expect(
+    await expect(
       authenticateUser.execute({
         email: "johndoe@example.com",
         password: "123123",
@@ -59,15 +53,6 @@ describe("AuthenticateUser", () => {
   });
 
   it("should not be able to authenticate with wrong credentials", async () => {
-    // instantiates the repository and then the service, by passing the repository created
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeHashProvider = new FakeHashProvider();
-    const createUser = new CreateUserService(fakeUsersRepository, fakeHashProvider);
-    const authenticateUser = new AuthenticateUserService(
-      fakeUsersRepository,
-      fakeHashProvider
-    );
-
     await createUser.execute({
       name: "john doe",
       email: "johndoe@example.com",
@@ -75,7 +60,7 @@ describe("AuthenticateUser", () => {
     });
 
     // conditions to satisfy the test
-    expect(
+    await expect(
       authenticateUser.execute({
         email: "johndoe@example.com",
         password: "wrong-password",
