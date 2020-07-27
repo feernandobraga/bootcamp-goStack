@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import appointmentsRouter from "@modules/appointments/infra/http/routes/appointments.routes";
+import providersRouter from "@modules/appointments/infra/http/routes/providers.routes";
 import usersRouter from "@modules/users/infra/http/routes/users.routes";
 import sessionsRouter from "@modules/users/infra/http/routes/sessions.routes";
 import passwordRouter from "@modules/users/infra/http/routes/password.routes";
@@ -22,5 +23,8 @@ routes.use("/password", passwordRouter);
 
 // redirect the user to the appropriate routes if the route is /profile
 routes.use("/profile", profileRouter);
+
+// redirect the user to the appropriate routes if the route is /profile
+routes.use("/providers", providersRouter);
 
 export default routes;

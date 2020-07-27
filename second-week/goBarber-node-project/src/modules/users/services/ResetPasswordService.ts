@@ -53,7 +53,7 @@ class ResetPasswordService {
     }
 
     const tokenCreateAt = userToken.created_at;
-    const compareDate = addHours(tokenCreateAt, 12);
+    const compareDate = addHours(tokenCreateAt, 2);
 
     // console.log(`token created at ${tokenCreateAt}`);
     // console.log("now", new Date(Date.now()));

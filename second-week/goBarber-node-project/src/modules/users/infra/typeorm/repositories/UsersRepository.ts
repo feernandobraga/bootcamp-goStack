@@ -1,4 +1,4 @@
-import { getRepository, Repository } from "typeorm";
+import { getRepository, Repository, Not } from "typeorm";
 
 import User from "../entities/User";
 
@@ -7,6 +7,7 @@ import IUsersRepository from "@modules/users/repositories/IUsersRepository";
 
 // importing the type required to create an appointment
 import ICreateUserDTO from "@modules/users/dtos/ICreateUserDTO";
+import IFindAllProvidersDTO from "@modules/users/dtos/IFindAllProvidersDTO";
 
 class UsersRepository implements IUsersRepository {
   //injecting/instantiating the repository from ORM
@@ -28,6 +29,24 @@ class UsersRepository implements IUsersRepository {
     });
 
     return user;
+  }
+
+  public async findAllProviders({
+    except_user_id,
+  }: IFindAllProvidersDTO): Promise<User[]> {
+    let users: User[];
+
+    if (except_user_id) {
+      users = await this.ormRepository.find({
+        where: {
+          id: Not(except_user_id),
+        },
+      });
+    } else {
+      users = await this.ormRepository.find();
+    }
+
+    return users;
   }
 
   public async create(userData: ICreateUserDTO): Promise<User> {
