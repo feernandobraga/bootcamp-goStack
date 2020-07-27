@@ -1,7 +1,7 @@
 import { uuid } from "uuidv4";
 
 // import isEqual to compare two dates
-import { isEqual, getMonth, getYear } from "date-fns";
+import { isEqual, getMonth, getYear, getDate } from "date-fns";
 
 import Appointment from "../../infra/typeorm/entities/Appointment";
 
@@ -13,6 +13,7 @@ import ICreateAppointmentDTO from "@modules/appointments/dtos/ICreateAppointment
 
 // importing the type required for finding all appointments for the month from a given provider
 import IFindAllInMonthFromProviderDTO from "@modules/appointments/dtos/IFindAllInMonthFromProviderDTO";
+import IFindAllInDayFromProviderDTO from "@modules/appointments/dtos/IFindAllInDayFromProviderDTO";
 
 class AppointmentsRepository implements IAppointmentsRepository {
   // creating an array of appointments
@@ -27,6 +28,27 @@ class AppointmentsRepository implements IAppointmentsRepository {
     );
 
     return findAppointment;
+  }
+
+  public async findAllInDayFromProvider({
+    provider_id,
+    day,
+    month,
+    year,
+  }: IFindAllInDayFromProviderDTO): Promise<Appointment[]> {
+    /**
+     * retrieve the availability for the month from a given provider
+     */
+    const appointments = this.appointments.filter((appointment) => {
+      return (
+        appointment.provider_id === provider_id &&
+        getDate(appointment.date) === day &&
+        getMonth(appointment.date) + 1 === month && // it needs the +1 because month starts from 0 in JavaScript forfucksake
+        getYear(appointment.date) === year
+      );
+    });
+
+    return appointments;
   }
 
   public async findAllInMonthFromProvider({

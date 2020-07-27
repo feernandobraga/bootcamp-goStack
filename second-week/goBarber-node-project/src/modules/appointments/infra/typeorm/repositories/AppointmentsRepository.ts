@@ -10,6 +10,7 @@ import ICreateAppointmentDTO from "@modules/appointments/dtos/ICreateAppointment
 
 // importing the type required for finding all appointments for the month from a given provider
 import IFindAllInMonthFromProviderDTO from "@modules/appointments/dtos/IFindAllInMonthFromProviderDTO";
+import IFindAllInDayFromProviderDTO from "@modules/appointments/dtos/IFindAllInDayFromProviderDTO";
 
 class AppointmentsRepository implements IAppointmentsRepository {
   //injecting/instantiating the repository from ORM
@@ -48,6 +49,36 @@ class AppointmentsRepository implements IAppointmentsRepository {
           (
             dateFieldName // Raw() is used to deal with SQL query directly
           ) => `to_char(${dateFieldName}, 'MM-YYYY') = '${parsedMonth}-${year}'`
+        ),
+      },
+    });
+
+    return appointments;
+  }
+
+  public async findAllInDayFromProvider({
+    provider_id,
+    day,
+    month,
+    year,
+  }: IFindAllInDayFromProviderDTO): Promise<Appointment[]> {
+    /**
+     * retrieve the availability for the day from a given provider
+     */
+
+    // reading padStart() -> if the variable doesn't have two digits, add 0 as the first digit
+    const parsedMonth = String(month).padStart(2, "0"); //this will convert the month to two digits, ie 1 becomes 01, 3 becomes 03, 10 remains 10
+
+    const parsedDay = String(day).padStart(2, "0");
+
+    const appointments = await this.ormRepository.find({
+      where: {
+        provider_id,
+        date: Raw(
+          (
+            dateFieldName // Raw() is used to deal with SQL query directly
+          ) =>
+            `to_char(${dateFieldName}, 'DD-MM-YYYY') = '${parsedDay}-${parsedMonth}-${year}'`
         ),
       },
     });

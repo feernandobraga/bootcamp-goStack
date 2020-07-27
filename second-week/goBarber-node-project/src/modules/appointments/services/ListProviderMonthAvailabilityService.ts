@@ -4,6 +4,9 @@ import AppError from "@shared/errors/AppError";
 // importing dependency injection decorators
 import { injectable, inject } from "tsyringe";
 
+// to find out how many days in a month
+import { getDaysInMonth, getDate } from "date-fns";
+
 import User from "@modules/users/infra/typeorm/entities/User";
 import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
 
@@ -28,20 +31,37 @@ class ListProviderMonthAvailabilityService {
   ) {}
 
   public async execute({ provider_id, year, month }: IRequest): Promise<IResponse> {
+    // retrieves all appointments for the month for a particular provider
     const appointments = await this.appointmentsRepository.findAllInMonthFromProvider({
       provider_id,
       year,
       month,
     });
 
-    console.log(appointments);
+    const numberOfDaysInMonth = getDaysInMonth(new Date(year, month - 1));
 
-    return [
+    // this creates an array based on the number of days in a month
+    const eachDayArray = Array.from(
       {
-        day: 1,
-        available: false,
+        length: numberOfDaysInMonth,
       },
-    ];
+      (value, index) => index + 1
+    );
+
+    // this will go through each day of the month
+    const availability = eachDayArray.map((day) => {
+      // and then will return all appointments where day is equals to the day from the map() function
+      const appointmentsInDay = appointments.filter((appointment) => {
+        return getDate(appointment.date) === day;
+      });
+
+      return {
+        day,
+        available: appointmentsInDay.length >= 10, // a day can only have 10 appointments, so if >= 10, no slots are available
+      };
+    });
+
+    return availability;
   }
 }
 
