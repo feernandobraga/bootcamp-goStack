@@ -1,6 +1,6 @@
 import Appointment from "../infra/typeorm/entities/Appointment";
 
-import { startOfHour, isBefore, getHours } from "date-fns";
+import { startOfHour, isBefore, getHours, format } from "date-fns";
 
 // import our custom error handling class
 import AppError from "@shared/errors/AppError";
@@ -9,6 +9,7 @@ import AppError from "@shared/errors/AppError";
 import { injectable, inject } from "tsyringe";
 
 import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
+import INotificationsRepository from "@modules/notifications/repositories/INotificationRepository";
 
 interface IRequest {
   provider_id: string;
@@ -20,7 +21,10 @@ interface IRequest {
 class CreateAppointmentService {
   constructor(
     @inject("AppointmentsRepository")
-    private appointmentsRepository: IAppointmentsRepository
+    private appointmentsRepository: IAppointmentsRepository,
+
+    @inject("NotificationsRepository")
+    private notificationsRepository: INotificationsRepository
   ) {}
 
   // date and provider are parameters coming from the routes, and strongly type it through the interface IRequest just above this line.
@@ -55,15 +59,18 @@ class CreateAppointmentService {
       );
     }
 
-    /**
-     * the method create doesn't save the information in the database yet, it just creates the object. We need to call the method
-     * .save() to actually save it into the database. Since it may take a while to return, we need to use await, and for that, the method
-     * execute needs to be converted to an asynchronous method that returns a promise of type Appointment
-     */
     const appointment = await this.appointmentsRepository.create({
       provider_id,
       user_id,
       date: appointmentDate,
+    });
+
+    const dateFormatted = format(appointmentDate, "dd/MM/yyyy 'at' HH:mm'h'"); // formatting the date to pass it on as notification
+
+    // once the appointment is create, it stores a notification on MongoDB
+    await this.notificationsRepository.create({
+      recipient_id: provider_id,
+      content: `You have a new booking on the ${dateFormatted}`,
     });
 
     return appointment;

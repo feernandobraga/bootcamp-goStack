@@ -3,17 +3,24 @@ import FakeAppointmentsRepository from "../repositories/fakes/FakeAppointmentsRe
 
 import AppError from "@shared/errors/AppError";
 
+import FakeNotificationsRepository from "@modules/notifications/repositories/fakes/FakeNotificationsRepository";
+
 // importing the service that we will test
 import CreateAppointmentService from "./CreateAppointmentService";
 
 let fakeAppointmentsRepository: FakeAppointmentsRepository;
 let createAppointment: CreateAppointmentService;
+let fakeNotificationsRepository: FakeNotificationsRepository;
 
 describe("CreateAppointment", () => {
   beforeEach(() => {
     // instantiates the repository and then the service, by passing the repository created
     fakeAppointmentsRepository = new FakeAppointmentsRepository();
-    createAppointment = new CreateAppointmentService(fakeAppointmentsRepository);
+    fakeNotificationsRepository = new FakeNotificationsRepository();
+    createAppointment = new CreateAppointmentService(
+      fakeAppointmentsRepository,
+      fakeNotificationsRepository
+    );
   });
 
   it("should be able to create a new appointment", async () => {

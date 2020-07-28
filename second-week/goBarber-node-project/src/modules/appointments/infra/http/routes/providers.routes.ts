@@ -22,9 +22,15 @@ providersRouter.use(ensureAuthenticated);
 providersRouter.get("/", providersController.index);
 
 // localhost:333/providers/providers:id
-providersRouter.get("/:provider_id/month-availability", providerMonthAvailabilityController.index);
+providersRouter.get(
+  "/:provider_id/month-availability",
+  providerMonthAvailabilityController.index
+);
 
 // localhost:333/providers/:provider_id/
-providersRouter.get("/:provider_id/day-availability", providerDayAvailabilityController.index);
+providersRouter.get(
+  "/:provider_id/day-availability",
+  providerDayAvailabilityController.index
+);
 
 export default providersRouter;

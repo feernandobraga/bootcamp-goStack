@@ -5,29 +5,20 @@ import ensureAuthenticated from "@modules/users/infra/http/middlewares/ensureAut
 
 // import the controller
 import AppointmentsController from "../controllers/AppointmentsController";
+import ProviderAppointmentsController from "../controllers/ProviderAppointmentsController";
 
 // instantiating a new controller
 const appointmentsController = new AppointmentsController();
+const providerAppointmentsController = new ProviderAppointmentsController();
 
 const appointmentsRouter = Router();
 
 // adds the middleware checking to all rotes related to appointments
 appointmentsRouter.use(ensureAuthenticated);
 
-/**
- * GET to localhost:3333/appointments
- */
-// appointmentsRouter.get("/", async (request, response) => {
-//   const appointmentsRepository = getCustomRepository(AppointmentsRepository);
-//   const appointments = await appointmentsRepository.find();
-
-//   return response.json(appointments);
-// });
-
-/**
- * POST to localhost:3333/appointments
- * the route calls the controller that calls the service that calls the repository
- */
 appointmentsRouter.post("/", appointmentsController.create);
+
+// display all appointments for the logged provider
+appointmentsRouter.get("/me", providerAppointmentsController.index);
 
 export default appointmentsRouter;
