@@ -13,6 +13,9 @@ export default class AppointmentsController {
     // gets the barber and the date to create an appointment
     const { provider_id, date } = request.body;
 
+    // retrieving the user that is logged in
+    const user_id = request.user.id;
+
     // gets the date that is coming from the api, converts is to a JS object
     const parsedDate = parseISO(date);
 
@@ -24,6 +27,7 @@ export default class AppointmentsController {
     const appointment = await createAppointment.execute({
       date: parsedDate,
       provider_id,
+      user_id,
     });
 
     // returns the newly created appointment

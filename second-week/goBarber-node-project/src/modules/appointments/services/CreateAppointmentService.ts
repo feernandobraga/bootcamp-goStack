@@ -1,6 +1,6 @@
 import Appointment from "../infra/typeorm/entities/Appointment";
 
-import { startOfHour } from "date-fns";
+import { startOfHour, isBefore, getHours } from "date-fns";
 
 // import our custom error handling class
 import AppError from "@shared/errors/AppError";
@@ -12,6 +12,7 @@ import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
 
 interface IRequest {
   provider_id: string;
+  user_id: string;
   date: Date;
 }
 
@@ -23,8 +24,18 @@ class CreateAppointmentService {
   ) {}
 
   // date and provider are parameters coming from the routes, and strongly type it through the interface IRequest just above this line.
-  public async execute({ date, provider_id }: IRequest): Promise<Appointment> {
+  public async execute({ date, provider_id, user_id }: IRequest): Promise<Appointment> {
     const appointmentDate = startOfHour(date);
+
+    if (isBefore(appointmentDate, Date.now())) {
+      // user should not be able to book an appointment in the past
+      throw new AppError("You cannot create an appointment in a past date");
+    }
+
+    if (user_id === provider_id) {
+      // user should not be able to schedule an appointment with himself
+      throw new AppError("You cannot create an appointment with yourself");
+    }
 
     // runs the method findByDate() from the AppointmentsRepository and if it finds one appointment, returns it,
     // otherwise, it returns null. Since it is querying the database, it needs to be an asynchronous function
@@ -33,7 +44,15 @@ class CreateAppointmentService {
     );
 
     if (findAppointmentInSameDate) {
+      // condition for two appointments in the same hour
       throw new AppError("This time slot is not available anymore");
+    }
+
+    if (getHours(appointmentDate) < 8 || getHours(appointmentDate) > 17) {
+      // user can only make bookings within the business hours
+      throw new AppError(
+        "You cannot create appointments out of the business hours - 8AM - 5PM"
+      );
     }
 
     /**
@@ -43,6 +62,7 @@ class CreateAppointmentService {
      */
     const appointment = await this.appointmentsRepository.create({
       provider_id,
+      user_id,
       date: appointmentDate,
     });
 

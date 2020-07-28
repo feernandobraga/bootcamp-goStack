@@ -5,7 +5,7 @@ import AppError from "@shared/errors/AppError";
 import { injectable, inject } from "tsyringe";
 
 // to find out how many days in a month
-import { getDaysInMonth, getDate, getHours } from "date-fns";
+import { getDaysInMonth, getDate, getHours, isAfter } from "date-fns";
 
 import User from "@modules/users/infra/typeorm/entities/User";
 import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
@@ -46,6 +46,8 @@ class ListProviderDayAvailabilityService {
 
     const eachHourArray = Array.from({ length: 10 }, (value, index) => index + hourStart);
 
+    const currentDate = new Date(Date.now());
+
     // scan hours from 8 until 17 (which is hourStart + 10)
     const availability = eachHourArray.map((hour) => {
       const hasAppointmentInHour = appointments.find(
@@ -67,9 +69,13 @@ class ListProviderDayAvailabilityService {
         );
       }
 
+      // this is so we can display availability, but excluding the hours of the day that have already passed.
+      // it creates a new date based on the params given to the function and compares it to the value of current date
+      const compareDate = new Date(year, month - 1, day, hour);
+
       return {
         hour,
-        available: !hasAppointmentInHour,
+        available: !hasAppointmentInHour && isAfter(compareDate, currentDate), // check if there is not appointment on that time, and if the time is not from hours ago
       };
     });
 

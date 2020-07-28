@@ -51,13 +51,15 @@ class ListProviderMonthAvailabilityService {
     // this will go through each day of the month
     const availability = eachDayArray.map((day) => {
       // and then will return all appointments where day is equals to the day from the map() function
+      // appointmentsInDay is an array that stores appointments, so by checking its length, we now how many appointments we have on that day
       const appointmentsInDay = appointments.filter((appointment) => {
         return getDate(appointment.date) === day;
       });
 
       return {
         day,
-        available: appointmentsInDay.length >= 10, // a day can only have 10 appointments, so if >= 10, no slots are available
+        available: appointmentsInDay.length < 10, // a day can only have 10 appointments, so if >= 10, no slots are available
+        // change to < 1, to pass the test
       };
     });
 
