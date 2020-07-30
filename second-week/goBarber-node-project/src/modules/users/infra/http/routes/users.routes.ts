@@ -8,6 +8,9 @@ import ensureAuthenticated from "../middlewares/ensureAuthenticated";
 // import multer to handle the avatar
 import multer from "multer";
 
+// for validating the data coming from the API call
+import { celebrate, Segments, Joi } from "celebrate";
+
 //import the upload configuration file
 import uploadConfig from "@config/upload";
 
@@ -32,7 +35,17 @@ const upload = multer(uploadConfig);
  * POST to localhost:3333/users
  * route to create a new user
  */
-usersRouter.post("/", usersController.create);
+usersRouter.post(
+  "/",
+  celebrate({
+    [Segments.BODY]: {
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    },
+  }),
+  usersController.create
+);
 
 /**
  * PATCH to localhost:3333/users/avatar

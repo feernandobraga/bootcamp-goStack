@@ -8,6 +8,9 @@ import ProvidersController from "../controllers/ProvidersController";
 import ProviderMonthAvailabilityController from "../controllers/ProviderMonthAvailabilityController";
 import ProviderDayAvailabilityController from "../controllers/ProviderDayAvailabilityController";
 
+// for data validation
+import { celebrate, Segments, Joi } from 'celebrate'
+
 // instantiating the controller
 const providersController = new ProvidersController();
 const providerMonthAvailabilityController = new ProviderMonthAvailabilityController();
@@ -23,13 +26,21 @@ providersRouter.get("/", providersController.index);
 
 // localhost:333/providers/providers:id
 providersRouter.get(
-  "/:provider_id/month-availability",
+  "/:provider_id/month-availability", celebrate({
+    [Segments.PARAMS]: { // this time it gets the params from the url
+      provider_id: Joi.string().uuid().required(),
+    }
+  }),
   providerMonthAvailabilityController.index
 );
 
 // localhost:333/providers/:provider_id/
 providersRouter.get(
-  "/:provider_id/day-availability",
+  "/:provider_id/day-availability",celebrate({
+    [Segments.PARAMS]: { // this time it gets the params from the url
+      provider_id: Joi.string().uuid().required(),
+    }
+  }),
   providerDayAvailabilityController.index
 );
 
