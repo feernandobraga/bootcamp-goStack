@@ -30,6 +30,7 @@ export default class SESMailProvider implements IMailProvider {
       // instantiates the SES in the constructor
       SES: new aws.SES({
         apiVersion: "2010-12-01",
+        region: "ap-southeast-2",
       }),
     });
   }
@@ -51,7 +52,7 @@ export default class SESMailProvider implements IMailProvider {
         name: to.name,
         address: to.email,
       },
-      subject: "Password recover",
+      subject,
       html: await this.mailTemplateProvider.parse(templateData),
     });
   }

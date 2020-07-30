@@ -29,7 +29,7 @@ const userAvatarController = new UserAvatarController();
 const usersRouter = Router();
 
 // we will use this variable to handle the upload file
-const upload = multer(uploadConfig);
+const upload = multer(uploadConfig.multer);
 
 /**
  * POST to localhost:3333/users
