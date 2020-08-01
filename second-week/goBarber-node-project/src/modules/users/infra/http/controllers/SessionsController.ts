@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 // import container for dependency injection
 import { container } from "tsyringe";
 
+// to apply the class-transformation
+import { classToClass } from "class-transformer";
+
 //importing the service so we can use it
 import AuthenticateUserService from "@modules/users/services/AuthenticateUserService";
 
@@ -18,8 +21,6 @@ export default class SessionsController {
       password,
     });
 
-    delete user.password;
-
-    return response.json({ user, token });
+    return response.json({ user: classToClass(user), token });
   }
 }

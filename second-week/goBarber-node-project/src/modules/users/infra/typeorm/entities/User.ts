@@ -8,7 +8,8 @@ import {
 
 import uploadConfig from "@config/upload";
 
-import { Expose } from "class-transformer";
+// to change the API response
+import { Expose, Exclude } from "class-transformer";
 
 /**
  * by adding @Entity we are linking new objects from this class with the database, so when you save an object of
@@ -33,6 +34,7 @@ class User {
   email: string;
 
   @Column()
+  @Exclude() // remove the password from the API response
   password: string;
 
   @Column()
@@ -44,8 +46,10 @@ class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Expose({ name: "avatar_url" })
-  getAvatarUrl(): string | null {
+  @Expose({ name: "avatar_url" }) // the name to be returned in the API response
+  get AvatarUrl(): string | null {
+    // a simple get method that we just create here to get the avatar
+
     if (!this.avatar) {
       return null;
     }
@@ -54,11 +58,10 @@ class User {
       case "disk":
         return `${process.env.APP_API_URL}/files/${this.avatar}`;
       case "s3":
-        return null;
+        return `https://s3-ap-southeast-2.amazonaws.com/${uploadConfig.config.aws.bucket}/${this.avatar}`;
       default:
         return null;
     }
-    return this.avatar ? `${process.env.APP_API_URL}/files/${this.avatar}` : null;
   }
 }
 

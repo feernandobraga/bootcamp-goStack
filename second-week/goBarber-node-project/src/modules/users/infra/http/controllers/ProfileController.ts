@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 // import container for dependency injection
 import { container } from "tsyringe";
 
+// to apply the class-transformation
+import { classToClass } from "class-transformer";
+
 //importing the service so we can use it
 import UpdateProfileService from "@modules/users/services/UpdateProfileService";
 import ShowProfileService from "@modules/users/services/ShowProfileService";
@@ -15,9 +18,7 @@ export default class ProfileController {
 
     const user = await showProfile.execute({ user_id }); // run the execute() method from the service
 
-    delete user.password; // to omit the password from the json response
-
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
@@ -38,6 +39,6 @@ export default class ProfileController {
     // we can delete the user password from the response, so it doesn't show back to the user/API request
     delete user.password;
 
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 }

@@ -10,6 +10,7 @@ import { injectable, inject } from "tsyringe";
 
 import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
 import INotificationsRepository from "@modules/notifications/repositories/INotificationRepository";
+import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
 
 interface IRequest {
   provider_id: string;
@@ -24,7 +25,10 @@ class CreateAppointmentService {
     private appointmentsRepository: IAppointmentsRepository,
 
     @inject("NotificationsRepository")
-    private notificationsRepository: INotificationsRepository
+    private notificationsRepository: INotificationsRepository,
+
+    @inject("CacheProvider")
+    private cacheProvider: ICacheProvider
   ) {}
 
   // date and provider are parameters coming from the routes, and strongly type it through the interface IRequest just above this line.
@@ -72,6 +76,11 @@ class CreateAppointmentService {
       recipient_id: provider_id,
       content: `You have a new booking on the ${dateFormatted}`,
     });
+
+    await this.cacheProvider.invalidatePrefix(
+      // when a new appointment is create, we need to invalidate the cache
+      `provider-appointments:${provider_id}:${format(appointmentDate, "yyyy-M-d")}`
+    );
 
     return appointment;
   }

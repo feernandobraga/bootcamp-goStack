@@ -17,7 +17,7 @@ export default class AppointmentsController {
     const user_id = request.user.id;
 
     // gets the date that is coming from the api, converts is to a JS object
-    const parsedDate = parseISO(date);
+    // const parsedDate = parseISO(date);
 
     // instantiate a new Service -> CreateAppointmentService
     const createAppointment = container.resolve(CreateAppointmentService);
@@ -25,7 +25,7 @@ export default class AppointmentsController {
     // since the execute() will save data to the database, this needs to be an asynchronous function and therefore, needs
     // the await keyword. Also, the method post needs to be an asynchronous function.
     const appointment = await createAppointment.execute({
-      date: parsedDate,
+      date,
       provider_id,
       user_id,
     });

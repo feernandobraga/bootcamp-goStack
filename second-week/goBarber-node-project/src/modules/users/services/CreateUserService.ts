@@ -10,6 +10,9 @@ import IUsersRepository from "../repositories/IUsersRepository";
 // import the interface for the provider responsible for hashing the passwords
 import IHashProvider from "../providers/HashProvider/models/IHashProvider";
 
+// for handling the cached database
+import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
+
 // interface that tells how the API will send data to the method execute, which is of type Request.
 interface IRequest {
   name: string;
@@ -24,7 +27,10 @@ class CreateUserService {
     private usersRepository: IUsersRepository,
 
     @inject("HashProvider")
-    private hashProvider: IHashProvider
+    private hashProvider: IHashProvider,
+
+    @inject("CacheProvider")
+    private cacheProvider: ICacheProvider
   ) {}
 
   // this is an asynchronous method that returns a promise of a type User, because we want to return a user
@@ -47,6 +53,8 @@ class CreateUserService {
       email,
       password: hashedPassword,
     });
+
+    await this.cacheProvider.invalidatePrefix("providers-list");
 
     return user;
   }

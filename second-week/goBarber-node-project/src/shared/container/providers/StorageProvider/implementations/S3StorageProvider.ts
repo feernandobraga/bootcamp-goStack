@@ -34,7 +34,7 @@ class DiskStorageProvider implements IStorageProvider {
 
     await this.client
       .putObject({
-        Bucket: "me.fernandobraga.app-gobarber", //bucket name on ACS
+        Bucket: uploadConfig.config.aws.bucket, //bucket name on ACS
         Key: file, // file name
         ACL: "public-read", // permissions for that file
         Body: fileContent, // the actual content of the file
@@ -43,13 +43,15 @@ class DiskStorageProvider implements IStorageProvider {
       })
       .promise(); // we use .promise() so we wait for it to finish
 
+    await fs.promises.unlink(originalPath);
+
     return file;
   }
 
   public async deleteFile(file: string): Promise<void> {
     await this.client
       .deleteObject({
-        Bucket: "me.fernandobraga.app-gobarber", //bucket name on ACS
+        Bucket: uploadConfig.config.aws.bucket, //bucket name on ACS
         Key: file, //file name
       })
       .promise();

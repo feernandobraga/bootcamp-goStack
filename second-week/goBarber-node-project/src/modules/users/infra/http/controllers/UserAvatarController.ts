@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 // import container for dependency injection
 import { container } from "tsyringe";
 
+// to apply the class-transformation
+import { classToClass } from "class-transformer";
+
 // import AvatarService
 import UpdateUserAvatarService from "@modules/users/services/UpdateUserAvatarService";
 
@@ -22,6 +25,6 @@ export default class UserAvatarController {
 
     delete user.password;
 
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 }
