@@ -3,6 +3,8 @@ import "reflect-metadata";
 // to handle the environment variables
 import "dotenv/config";
 
+import rateLimiter from "./middlewares/rateLimiter";
+
 import express, { Request, Response, NextFunction } from "express";
 // the express-async-errors lib needs to be imported right after the express
 import "express-async-errors";
@@ -27,6 +29,8 @@ import "@shared/container";
 import cors from "cors";
 
 const app = express();
+
+app.use(rateLimiter); // to prevent API abuse
 app.use(cors());
 app.use(express.json());
 app.use("/files", express.static(uploadConfig.uploadsFolder));

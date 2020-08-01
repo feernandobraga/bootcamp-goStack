@@ -4,17 +4,19 @@ import FakeUsersRepository from "@modules/users/repositories/fakes/FakeUsersRepo
 
 // importing the service that we will test
 import ListProvidersService from "./ListProvidersService";
+import FakeCacheProvider from "@shared/container/providers/CacheProvider/fakes/FakeCacheProvider";
 
 let fakeUsersRepository: FakeUsersRepository;
 let listProviders: ListProvidersService;
+let fakeCacheProvider: FakeCacheProvider;
 
 describe("ListProviders", () => {
   beforeEach(() => {
     // instantiates the repository and then the service, by passing the repository created
     fakeUsersRepository = new FakeUsersRepository();
-
+    fakeCacheProvider = new FakeCacheProvider();
     // create the service based on the repository
-    listProviders = new ListProvidersService(fakeUsersRepository);
+    listProviders = new ListProvidersService(fakeUsersRepository, fakeCacheProvider);
   });
 
   it("should be able to list the providers", async () => {
