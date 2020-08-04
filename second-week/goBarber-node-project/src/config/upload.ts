@@ -1,5 +1,5 @@
 import path from "path";
-import multer from "multer";
+import multer, { StorageEngine } from "multer";
 
 // method used to create hashed
 import crypto from "crypto";
@@ -12,19 +12,50 @@ import crypto from "crypto";
  *      |- the callback is a function that we call after generating the name of the file
  */
 
+// interface to define the type of driver
+interface IUploadConfig {
+  driver: "s3" | "disk";
+
+  tmpFolder: string;
+  uploadsFolder: string;
+
+  multer: {
+    storage: StorageEngine;
+  };
+
+  config: {
+    disk: {};
+    aws: {
+      bucket: string;
+    };
+  };
+}
+
 const tmpFolder = path.resolve(__dirname, "..", "..", "tmp");
 
 export default {
-  directory: tmpFolder, // we export this so we can find that the directory is by using upload.directory from the UpdateUserAvatarService
+  driver: process.env.STORAGE_DRIVER,
 
-  storage: multer.diskStorage({
-    destination: tmpFolder,
-    filename(request, file, callback) {
-      // here we are going to hash the filename, so it doesn't not occur of two users uploading a file with the same name
-      const fileHash = crypto.randomBytes(10).toString("hex");
-      const fileName = `${fileHash}-${file.originalname}`;
+  tmpFolder,
+  uploadsFolder: path.resolve(tmpFolder, "uploads"),
 
-      return callback(null, fileName);
+  multer: {
+    storage: multer.diskStorage({
+      destination: tmpFolder,
+      filename(request, file, callback) {
+        // here we are going to hash the filename, so it doesn't not occur of two users uploading a file with the same name
+        const fileHash = crypto.randomBytes(10).toString("hex");
+        const fileName = `${fileHash}-${file.originalname}`;
+
+        return callback(null, fileName);
+      },
+    }),
+  },
+
+  config: {
+    disk: {},
+    aws: {
+      bucket: "me.fernandobraga.app-gobarber",
     },
-  }),
-};
+  },
+} as IUploadConfig;

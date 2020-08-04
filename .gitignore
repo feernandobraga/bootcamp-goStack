@@ -2,3 +2,6 @@
 
 /second-week/goBarber-node-project/tmp/*
 ! /second-week/goBarber-node-project/tmp/.gitkeep
+
+second-week/goBarber-node-project/.env
+/second-week/goBarber-node-project/.env
