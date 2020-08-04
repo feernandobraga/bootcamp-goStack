@@ -18,7 +18,7 @@ export default class UsersController {
     const user = await createUser.execute({ name, email, password });
 
     // we can delete the user password from the response, so it doesn't show back to the user/API request
-    delete user.password;
+    // delete user.password;
 
     return response.json(classToClass(user));
   }
