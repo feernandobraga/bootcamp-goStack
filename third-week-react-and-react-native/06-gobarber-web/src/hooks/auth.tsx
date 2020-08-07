@@ -3,6 +3,12 @@ import React, { createContext, useCallback, useState, useContext } from "react";
 // importing the API
 import api from "../services/api";
 
+interface User {
+  id: string;
+  avatar_url: string;
+  name: string;
+}
+
 // interface to handle credentials
 interface SignInCredentials {
   email: string;
@@ -12,7 +18,7 @@ interface SignInCredentials {
 // the information we will store about a certain API call
 // this information is going to be accessible by other components/pages
 interface AuthContextData {
-  user: object; // the user logged in
+  user: User; // the user logged in
   signIn(credentials: SignInCredentials): Promise<void>; // signIn method
   signOut(): void; // signOut method
 }
@@ -20,7 +26,7 @@ interface AuthContextData {
 // interface to store user information into localStorage
 interface AuthState {
   token: string;
-  user: object;
+  user: User;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);

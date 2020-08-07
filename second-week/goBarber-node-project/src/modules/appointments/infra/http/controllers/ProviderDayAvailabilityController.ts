@@ -9,7 +9,7 @@ import ListProviderDayAvailabilityService from "@modules/appointments/services/L
 export default class ProviderDayAvailabilityController {
   public async index(request: Request, response: Response): Promise<Response> {
     const { provider_id } = request.params; // get the provider id from the URL
-    const { month, day, year } = request.body; // gets the information from the API call
+    const { month, day, year } = request.query; // gets the information from the URL
 
     // instantiate a new Service via dependency injection. It automatically passes the repository associated with it
     const listProviderDayAvailabilityService = container.resolve(
@@ -18,9 +18,9 @@ export default class ProviderDayAvailabilityController {
 
     const availability = await listProviderDayAvailabilityService.execute({
       provider_id,
-      day,
-      month,
-      year,
+      day: Number(day),
+      month: Number(month),
+      year: Number(year),
     });
 
     // returns the newly created providers

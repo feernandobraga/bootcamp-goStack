@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { FiLogIn, FiMail, FiLock } from "react-icons/fi";
 
@@ -23,22 +23,23 @@ import Input from "../../components/Input";
 import Button from "../../components/Button";
 
 import { Container, Content, AnimationContainer, Background } from "./styles";
+import api from "../../services/api";
 
-interface SignInFormData {
+interface ForgotPasswordFormData {
   email: string;
-  password: string;
 }
 
-const SignIn: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { signIn } = useAuth();
+  const [loading, setLoading] = useState(false);
+
   const { addToast } = useToast();
-  const history = useHistory();
 
   const handleSubmit = useCallback(
-    async (data: SignInFormData) => {
+    async (data: ForgotPasswordFormData) => {
       try {
+        setLoading(true);
         formRef.current?.setErrors({});
 
         // we create a validation schema and pass the data from the from to it
@@ -46,7 +47,6 @@ const SignIn: React.FC = () => {
           email: Yup.string()
             .required("You must enter an email")
             .email("Please enter a valid email address"),
-          password: Yup.string().required("Please enter a password"),
         });
 
         // abortEarly: false is used so Yub doesn't stop at the first validation error and keeps going
@@ -54,12 +54,20 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        await signIn({
+        // password recover
+
+        await api.post("/password/forgot", {
           email: data.email,
-          password: data.password,
         });
 
-        history.push("/dashboard");
+        addToast({
+          type: "success",
+          title: "Password recover email was sent",
+          description:
+            "We've sent you an email to reset your password, please check your inbox.",
+        });
+
+        // history.push("/dashboard");
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -73,12 +81,15 @@ const SignIn: React.FC = () => {
 
         addToast({
           type: "error",
-          title: "Error during authentication...",
-          description: "username and password don't match",
+          title: "Error during password recover...",
+          description:
+            "Something went wrong with your password recover... Try again later.",
         });
+      } finally {
+        setLoading(false);
       }
     },
-    [signIn, addToast, history]
+    [addToast]
   );
 
   return (
@@ -87,18 +98,17 @@ const SignIn: React.FC = () => {
         <AnimationContainer>
           <img src={logoImg} alt="GoBarber" />
           <Form ref={formRef} onSubmit={handleSubmit}>
-            <h1>Sign In</h1>
+            <h1>Forgot Password</h1>
             <Input name="email" icon={FiMail} placeholder="Email" />
-            <Input name="password" icon={FiLock} type="password" placeholder="Password" />
 
-            <Button type="submit">LOGIN</Button>
-
-            <Link to="/forgot-password">I forgot my password</Link>
+            <Button loading={loading} type="submit">
+              Recover
+            </Button>
           </Form>
 
-          <Link to="/signup">
+          <Link to="/">
             <FiLogIn />
-            Sign Up!
+            Back to login
           </Link>
         </AnimationContainer>
       </Content>
@@ -107,4 +117,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default ForgotPassword;

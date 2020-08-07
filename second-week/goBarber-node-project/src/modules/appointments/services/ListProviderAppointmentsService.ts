@@ -12,6 +12,7 @@ import Appointment from "../infra/typeorm/entities/Appointment";
 import IAppointmentsRepository from "../repositories/IAppointmentsRepository";
 
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider"; // so we can use the cache provider
+import { classToClass } from "class-transformer"; // for serialization (to change how we return the API call)
 
 // interface used by the execute
 interface IRequest {
@@ -50,7 +51,7 @@ class ListProviderAppointmentsService {
         day,
       });
 
-      await this.cacheProvider.save(cacheKey, appointments);
+      await this.cacheProvider.save(cacheKey, classToClass(appointments));
     }
 
     return appointments;

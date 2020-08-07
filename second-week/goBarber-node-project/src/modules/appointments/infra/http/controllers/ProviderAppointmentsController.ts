@@ -11,7 +11,7 @@ import ListProviderAppointmentsService from "@modules/appointments/services/List
 export default class ProviderAppointmentsController {
   public async index(request: Request, response: Response): Promise<Response> {
     // gets the barber and the date to create an appointment
-    const { day, month, year } = request.body;
+    const { day, month, year } = request.query;
 
     // retrieving the user that is logged in
     const provider_id = request.user.id;
@@ -23,9 +23,9 @@ export default class ProviderAppointmentsController {
     // the await keyword. Also, the method post needs to be an asynchronous function.
     const appointments = await listProviderAppointments.execute({
       provider_id,
-      day,
-      month,
-      year,
+      day: Number(day),
+      month: Number(month),
+      year: Number(year),
     });
 
     // returns the newly created appointment

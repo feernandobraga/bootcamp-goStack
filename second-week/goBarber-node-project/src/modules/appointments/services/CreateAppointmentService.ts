@@ -48,7 +48,8 @@ class CreateAppointmentService {
     // runs the method findByDate() from the AppointmentsRepository and if it finds one appointment, returns it,
     // otherwise, it returns null. Since it is querying the database, it needs to be an asynchronous function
     const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(
-      appointmentDate
+      appointmentDate,
+      provider_id
     );
 
     if (findAppointmentInSameDate) {
