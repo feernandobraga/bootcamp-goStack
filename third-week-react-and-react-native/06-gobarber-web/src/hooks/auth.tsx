@@ -58,6 +58,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     const user = localStorage.getItem("@GoBarber:user");
 
     if (token && user) {
+      api.defaults.headers.authorization = `Bearer ${token}`; // this will be sent with all API calls if the user refresh the page
       return { token, user: JSON.parse(user) };
     }
 
@@ -76,6 +77,8 @@ export const AuthProvider: React.FC = ({ children }) => {
 
     localStorage.setItem("@GoBarber:token", token);
     localStorage.setItem("@GoBarber:user", JSON.stringify(user));
+
+    api.defaults.headers.authorization = `Bearer ${token}`; // this will be sent with all API calls once the user have signed in
 
     setData({ token, user });
   }, []);
