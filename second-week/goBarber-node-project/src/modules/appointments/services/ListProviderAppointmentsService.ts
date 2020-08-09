@@ -42,6 +42,10 @@ class ListProviderAppointmentsService {
 
     let appointments = await this.cacheProvider.recover<Appointment[]>(cacheKey); // retrieve all appointments in redis for that given key
 
+    console.log(`cache created ${cacheKey}`);
+    console.log(`content from cache ${appointments?.length}`);
+
+    // appointments = null;
     if (!appointments) {
       // if result not found in cached database, retrieve from postgres and save in redis
       appointments = await this.appointmentsRepository.findAllInDayFromProvider({

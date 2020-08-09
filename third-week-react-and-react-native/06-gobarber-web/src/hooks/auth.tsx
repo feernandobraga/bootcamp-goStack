@@ -7,6 +7,7 @@ interface User {
   id: string;
   avatar_url: string;
   name: string;
+  email: string;
 }
 
 // interface to handle credentials
@@ -21,6 +22,7 @@ interface AuthContextData {
   user: User; // the user logged in
   signIn(credentials: SignInCredentials): Promise<void>; // signIn method
   signOut(): void; // signOut method
+  updateUser(user: User): void; // function that updates the avatar
 }
 
 // interface to store user information into localStorage
@@ -90,9 +92,20 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
+  const updateUser = useCallback(
+    (user: User) => {
+      localStorage.setItem("@GoBarber:user", JSON.stringify(user));
+      setData({
+        token: data.token,
+        user,
+      });
+    },
+    [setData, data.token]
+  );
+
   return (
     /* AuthContext.Provider is what makes the context available by other components wrapped by it */
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: data.user, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

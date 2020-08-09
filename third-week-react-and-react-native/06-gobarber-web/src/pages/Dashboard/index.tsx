@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { isToday, format } from "date-fns"; // to handle dates\
+import { isToday, format, isAfter } from "date-fns"; // to handle dates\
 import enAU from "date-fns/locale/en-AU";
 import logoImg from "../../assets/logo.svg";
 
@@ -21,6 +21,8 @@ import {
 import { FiPower, FiClock } from "react-icons/fi";
 import { useAuth } from "../../hooks/auth";
 import api from "../../services/api";
+import { parseISO } from "date-fns/esm";
+import { Link } from "react-router-dom";
 
 interface MonthAvailabilityItem {
   day: number;
@@ -31,6 +33,7 @@ interface Appointment {
   //interface to handle each appointment coming back from the api post to /appointments/me
   id: string;
   date: string;
+  hourFormatted: string;
   user: {
     name: string;
     avatar_url: string;
@@ -47,7 +50,7 @@ const Dashboard: React.FC = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const handleDateChange = useCallback((day: Date, modifiers: DayModifiers) => {
-    if (modifiers.available) {
+    if (modifiers.available && !modifiers.disabled) {
       setSelectedDate(day);
     }
   }, []);
@@ -73,7 +76,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // fetch the appointments from API every time a day is selected
     api
-      .get("/appointments/me", {
+      .get<Appointment[]>("/appointments/me", {
         params: {
           year: selectedDate.getFullYear(),
           month: selectedDate.getMonth() + 1,
@@ -81,7 +84,14 @@ const Dashboard: React.FC = () => {
         },
       })
       .then((response) => {
-        setAppointments(response.data);
+        const appointmentsFormatted = response.data.map((appointment) => {
+          return {
+            ...appointment, // this is how you keep whatever was in the array and add/edit something else
+            hourFormatted: format(parseISO(appointment.date), "HH:mm"), // adding/editing a property from the array
+          };
+        });
+
+        setAppointments(appointmentsFormatted);
       });
   }, [selectedDate]);
 
@@ -110,6 +120,24 @@ const Dashboard: React.FC = () => {
     });
   }, [selectedDate]);
 
+  const morningAppointments = useMemo(() => {
+    return appointments.filter((appointment) => {
+      return parseISO(appointment.date).getHours() < 12;
+    });
+  }, [appointments]);
+
+  const afternoonAppointments = useMemo(() => {
+    return appointments.filter((appointment) => {
+      return parseISO(appointment.date).getHours() >= 12;
+    });
+  }, [appointments]);
+
+  const nextAppointment = useMemo(() => {
+    return appointments.find((appointment) =>
+      isAfter(parseISO(appointment.date), new Date())
+    );
+  }, [appointments]);
+
   return (
     <Container>
       <Header>
@@ -120,7 +148,9 @@ const Dashboard: React.FC = () => {
             <img src={user.avatar_url} alt={user.name} />
             <div>
               <span>Welcome,</span>
-              <strong>{user.name}</strong>
+              <Link to="/profile">
+                <strong>{user.name}</strong>
+              </Link>
             </div>
           </Profile>
           <button type="button" onClick={signOut}>
@@ -139,87 +169,66 @@ const Dashboard: React.FC = () => {
             <span>{selectedWeekDay}</span>
           </p>
 
-          <NextAppointment>
-            <strong>Next appointment</strong>
-            <div>
-              <img
-                src="https://thumbs.dreamstime.com/b/funny-cartoon-monster-face-vector-halloween-monster-square-avatar-funny-cartoon-monster-face-vector-monster-square-avatar-175918891.jpg"
-                alt="Client Name"
-              />
-              <strong>Fernando Braga</strong>
-              <span>
-                <FiClock />
-                08:00
-              </span>
-            </div>
-          </NextAppointment>
+          {isToday(selectedDate) && nextAppointment && (
+            <NextAppointment>
+              <strong>Next appointment</strong>
+              <div>
+                <img
+                  src={nextAppointment.user.avatar_url}
+                  alt={nextAppointment.user.name}
+                />
+                <strong>{nextAppointment.user.name}</strong>
+                <span>
+                  <FiClock />
+                  {nextAppointment.hourFormatted}
+                </span>
+              </div>
+            </NextAppointment>
+          )}
 
           <Section>
             <strong>Morning</strong>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
+            {morningAppointments.length === 0 && (
+              <p>
+                Enjoy your free morning
+                <span role="img" style={{ marginLeft: "8px" }} aria-label="coffee">
+                  ☕️
+                </span>
+              </p>
+            )}
 
-              <div>
-                <img
-                  src="https://thumbs.dreamstime.com/b/funny-cartoon-monster-face-vector-halloween-monster-square-avatar-funny-cartoon-monster-face-vector-monster-square-avatar-175918891.jpg"
-                  alt="Client Name"
-                />
-                <strong>Fernando Braga</strong>
-              </div>
-            </Appointment>
+            {morningAppointments.map((appointment) => (
+              <Appointment key={appointment.id}>
+                <span>
+                  <FiClock />
+                  {appointment.hourFormatted}
+                </span>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
-
-              <div>
-                <img
-                  src="https://thumbs.dreamstime.com/b/funny-cartoon-monster-face-vector-halloween-monster-square-avatar-funny-cartoon-monster-face-vector-monster-square-avatar-175918891.jpg"
-                  alt="Client Name"
-                />
-                <strong>Fernando Braga</strong>
-              </div>
-            </Appointment>
+                <div>
+                  <img src={appointment.user.avatar_url} alt={appointment.user.name} />
+                  <strong>{appointment.user.name}</strong>
+                </div>
+              </Appointment>
+            ))}
           </Section>
 
           <Section>
             <strong>Arvo</strong>
 
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
+            {afternoonAppointments.map((appointment) => (
+              <Appointment key={appointment.id}>
+                <span>
+                  <FiClock />
+                  {appointment.hourFormatted}
+                </span>
 
-              <div>
-                <img
-                  src="https://thumbs.dreamstime.com/b/funny-cartoon-monster-face-vector-halloween-monster-square-avatar-funny-cartoon-monster-face-vector-monster-square-avatar-175918891.jpg"
-                  alt="Client Name"
-                />
-                <strong>Fernando Braga</strong>
-              </div>
-            </Appointment>
-
-            <Appointment>
-              <span>
-                <FiClock />
-                08:00
-              </span>
-
-              <div>
-                <img
-                  src="https://thumbs.dreamstime.com/b/funny-cartoon-monster-face-vector-halloween-monster-square-avatar-funny-cartoon-monster-face-vector-monster-square-avatar-175918891.jpg"
-                  alt="Client Name"
-                />
-                <strong>Fernando Braga</strong>
-              </div>
-            </Appointment>
+                <div>
+                  <img src={appointment.user.avatar_url} alt={appointment.user.name} />
+                  <strong>{appointment.user.name}</strong>
+                </div>
+              </Appointment>
+            ))}
           </Section>
         </Schedule>
         <Calendar>

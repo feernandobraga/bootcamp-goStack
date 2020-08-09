@@ -82,6 +82,12 @@ class CreateAppointmentService {
       // when a new appointment is create, we need to invalidate the cache
       `provider-appointments:${provider_id}:${format(appointmentDate, "yyyy-M-d")}`
     );
+    console.log(
+      `cache invalidated: provider-appointments:${provider_id}:${format(
+        appointmentDate,
+        "yyyy-M-d"
+      )}`
+    );
 
     return appointment;
   }
