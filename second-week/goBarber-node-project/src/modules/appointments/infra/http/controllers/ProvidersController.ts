@@ -5,6 +5,7 @@ import { container } from "tsyringe";
 
 // importing the service used to create appointments
 import ListProvidersService from "@modules/appointments/services/ListProvidersService";
+import { classToClass } from "class-transformer";
 
 export default class ProvidersController {
   public async index(request: Request, response: Response): Promise<Response> {
@@ -20,6 +21,6 @@ export default class ProvidersController {
     });
 
     // returns the newly created providers
-    return response.json(providers);
+    return response.json(classToClass(providers));
   }
 }
