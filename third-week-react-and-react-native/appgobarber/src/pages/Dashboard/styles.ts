@@ -1,5 +1,5 @@
 import styled from "styled-components/native";
-import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import { getStatusBarHeight, getBottomSpace } from "react-native-iphone-x-helper";
 import { Provider } from "./index"; // importing the interface from the dashboard to use FlatList
 import { FlatList } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
