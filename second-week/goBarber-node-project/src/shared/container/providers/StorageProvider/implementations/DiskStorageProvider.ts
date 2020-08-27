@@ -13,6 +13,8 @@ class DiskStorageProvider implements IStorageProvider {
       path.resolve(uploadConfig.uploadsFolder, file)
     );
 
+    console.log("file was saved");
+
     return file;
   }
 
@@ -26,6 +28,7 @@ class DiskStorageProvider implements IStorageProvider {
     }
 
     await fs.promises.unlink(filePath);
+    console.log("file was deleted");
   }
 }
 

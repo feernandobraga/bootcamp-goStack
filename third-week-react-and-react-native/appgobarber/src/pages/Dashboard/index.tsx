@@ -36,7 +36,7 @@ export interface Provider {
 const Dashboard: React.FC = () => {
   const [providers, setProviders] = useState<Provider[]>([]); // store providers from API
 
-  const { signOut, user } = useAuth(); // handle authenticated user
+  const { user } = useAuth(); // handle authenticated user
   const { navigate } = useNavigation(); // handle routing
 
   useEffect(() => {
@@ -46,8 +46,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const navigateToProfile = useCallback(() => {
-    // navigate("Profile");
-    signOut();
+    navigate("Profile");
   }, [navigate]);
 
   const navigateToCreateAppointment = useCallback(
@@ -72,6 +71,7 @@ const Dashboard: React.FC = () => {
         </Header>
 
         <ProvidersList
+          contentContainerStyle={{ paddingBottom: 40 }}
           data={providers}
           keyExtractor={(provider) => provider.id}
           ListHeaderComponent={<ProvidersListTitle>Barbers</ProvidersListTitle>}
