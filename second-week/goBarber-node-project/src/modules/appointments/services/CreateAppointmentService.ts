@@ -48,7 +48,8 @@ class CreateAppointmentService {
     // runs the method findByDate() from the AppointmentsRepository and if it finds one appointment, returns it,
     // otherwise, it returns null. Since it is querying the database, it needs to be an asynchronous function
     const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(
-      appointmentDate
+      appointmentDate,
+      provider_id
     );
 
     if (findAppointmentInSameDate) {
@@ -80,6 +81,12 @@ class CreateAppointmentService {
     await this.cacheProvider.invalidatePrefix(
       // when a new appointment is create, we need to invalidate the cache
       `provider-appointments:${provider_id}:${format(appointmentDate, "yyyy-M-d")}`
+    );
+    console.log(
+      `cache invalidated: provider-appointments:${provider_id}:${format(
+        appointmentDate,
+        "yyyy-M-d"
+      )}`
     );
 
     return appointment;

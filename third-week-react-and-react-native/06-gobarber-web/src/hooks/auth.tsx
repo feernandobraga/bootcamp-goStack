@@ -3,6 +3,13 @@ import React, { createContext, useCallback, useState, useContext } from "react";
 // importing the API
 import api from "../services/api";
 
+interface User {
+  id: string;
+  avatar_url: string;
+  name: string;
+  email: string;
+}
+
 // interface to handle credentials
 interface SignInCredentials {
   email: string;
@@ -12,15 +19,16 @@ interface SignInCredentials {
 // the information we will store about a certain API call
 // this information is going to be accessible by other components/pages
 interface AuthContextData {
-  user: object; // the user logged in
+  user: User; // the user logged in
   signIn(credentials: SignInCredentials): Promise<void>; // signIn method
   signOut(): void; // signOut method
+  updateUser(user: User): void; // function that updates the avatar
 }
 
 // interface to store user information into localStorage
 interface AuthState {
   token: string;
-  user: object;
+  user: User;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -29,10 +37,6 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 // from other pages they only need to import useAuth() from this context file
 export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an <AuthProvider> element");
-  }
 
   return context;
 }
@@ -52,6 +56,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     const user = localStorage.getItem("@GoBarber:user");
 
     if (token && user) {
+      api.defaults.headers.authorization = `Bearer ${token}`; // this will be sent with all API calls if the user refresh the page
       return { token, user: JSON.parse(user) };
     }
 
@@ -71,6 +76,8 @@ export const AuthProvider: React.FC = ({ children }) => {
     localStorage.setItem("@GoBarber:token", token);
     localStorage.setItem("@GoBarber:user", JSON.stringify(user));
 
+    api.defaults.headers.authorization = `Bearer ${token}`; // this will be sent with all API calls once the user have signed in
+
     setData({ token, user });
   }, []);
 
@@ -81,9 +88,20 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
+  const updateUser = useCallback(
+    (user: User) => {
+      localStorage.setItem("@GoBarber:user", JSON.stringify(user));
+      setData({
+        token: data.token,
+        user,
+      });
+    },
+    [setData, data.token]
+  );
+
   return (
     /* AuthContext.Provider is what makes the context available by other components wrapped by it */
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: data.user, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

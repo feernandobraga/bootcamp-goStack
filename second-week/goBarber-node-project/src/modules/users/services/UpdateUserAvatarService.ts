@@ -44,6 +44,8 @@ class UpdateUserAvatarService {
       throw new AppError("Only Authenticated users can change avatar.", 401);
     }
 
+    console.log("inside avatar");
+
     // if the avatar already exists, delete previous avatar from the storage
     if (user.avatar) {
       await this.storageProvider.deleteFile(user.avatar);
@@ -51,9 +53,13 @@ class UpdateUserAvatarService {
 
     const filename = await this.storageProvider.saveFile(avatarFilename);
 
+    console.log("filesaved");
+
     // since we already loaded the user at the beginning of this file, we can just update the avatar and save it to the DB
     user.avatar = filename;
     await this.usersRepository.save(user);
+
+    console.log("just before returning user");
 
     return user;
   }

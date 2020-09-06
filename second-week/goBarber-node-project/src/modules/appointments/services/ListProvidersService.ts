@@ -7,6 +7,7 @@ import { injectable, inject } from "tsyringe";
 import User from "@modules/users/infra/typeorm/entities/User";
 import IUsersRepository from "@modules/users/repositories/IUsersRepository";
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
+import { classToClass } from "class-transformer";
 
 // the method execute will receive the user_id.
 interface IRequest {
@@ -27,13 +28,14 @@ class ListProvidersService {
     // try to fetch information from the cache database
     let users = await this.cacheProvider.recover<User[]>(`providers-list:${user_id}`);
 
+    // users = null;
     if (!users) {
       // if information doesn't exists in the cached database, fetch it from the relational database and save it into redis
       users = await this.usersRepository.findAllProviders({
         except_user_id: user_id,
       });
 
-      await this.cacheProvider.save(`providers-list:${user_id}`, users); // semi-column is used to separate categories in redis
+      await this.cacheProvider.save(`providers-list:${user_id}`, classToClass(users)); // semi-column is used to separate categories in redis
     }
 
     return users;

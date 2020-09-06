@@ -18,19 +18,28 @@ interface SignInCredentials {
   password: string;
 }
 
+// interface to handle the user information from api calls
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+}
+
 // the information we will store about a certain API call
 // this information is going to be accessible by other components/pages
 interface AuthContextData {
-  user: object;
+  user: User;
   signIn(credentials: SignInCredentials): Promise<void>; //signIn method
   signOut(): void; // signOut method
   loading: boolean;
+  updateUser(user: User): Promise<void>; // called when the user update his profile
 }
 
 // interface to store user information into localStorage
 interface AuthState {
   token: string;
-  user: object;
+  user: User;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -72,6 +81,8 @@ export const AuthProvider: React.FC = ({ children }) => {
 
       // the key is stored in the value [0], and the value in the position [1]
       if (token[1] && user[1]) {
+        api.defaults.headers.authorization = `Bearer ${token[1]}`; // to send the authorization request with every API call
+
         setData({ token: token[1], user: JSON.parse(user[1]) });
       }
 
@@ -90,16 +101,18 @@ export const AuthProvider: React.FC = ({ children }) => {
       password,
     });
 
-    // storing the JWT and the user into local storage
     const { token, user } = response.data;
 
-    await AsyncStorage.setItem("@GoBarber:token", token);
-    await AsyncStorage.setItem("@GoBarber:user", JSON.stringify(user));
+    // storing the JWT and the user into local storage
+    // await AsyncStorage.setItem("@GoBarber:token", token);
+    // await AsyncStorage.setItem("@GoBarber:user", JSON.stringify(user));
 
     await AsyncStorage.multiSet([
       ["@GoBarber:token", token],
       ["@GoBarber:user", JSON.stringify(user)],
     ]);
+
+    api.defaults.headers.authorization = `Bearer ${token}`; // to send the authorization request with every API call
 
     setData({ token, user });
   }, []);
@@ -110,9 +123,23 @@ export const AuthProvider: React.FC = ({ children }) => {
     setData({} as AuthState);
   }, []);
 
+  const updateUser = useCallback(
+    async (user: User) => {
+      await AsyncStorage.setItem("@GoBarber:user", JSON.stringify(user));
+
+      setData({
+        token: data.token,
+        user,
+      });
+    },
+    [setData, data.token]
+  );
+
   return (
     /* AuthContext.Provider is what makes the context available by other components wrapped by it */
-    <AuthContext.Provider value={{ user: data.user, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user: data.user, loading, signIn, signOut, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -26,20 +26,20 @@ import { useToast } from "../../hooks/toast";
 
 import { Container, Content, Background, AnimationContainer } from "./styles";
 
-interface SignUpFormData {
+interface ProfileFormData {
   name: string;
   email: string;
   password: string;
 }
 
-const SignUp: React.FC = () => {
+const Profile: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
   const history = useHistory();
 
   const handleSubmit = useCallback(
-    async (data: SignUpFormData) => {
+    async (data: ProfileFormData) => {
       try {
         formRef.current?.setErrors({});
 
@@ -112,4 +112,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default Profile;

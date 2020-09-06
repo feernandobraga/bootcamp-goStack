@@ -4,7 +4,7 @@ import { animated } from "react-spring";
 // the type can only be 'success' or 'error' or 'info'
 interface ContainerProps {
   type?: "success" | "error" | "info";
-  hasDescription: boolean;
+  hasDescription: number;
 }
 
 // instead of using multiple if conditions, we can create an object with the variations and call the right property according to the props
