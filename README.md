@@ -8,7 +8,7 @@ goBarber is an application where barbers can offer their services to the public 
 
 During the course we are also faced with a few challenges/exercises that we have to resolve on our own. These challenges are there to help us getting the content sticked in our heads and practice the content we learnt during a particular module.
 
-**_Practicing is the key!_**
+**_Practice is the key!_**
 
 Enough talking... Below are the links to the goBarber application and to the resolution of all challenges.
 
